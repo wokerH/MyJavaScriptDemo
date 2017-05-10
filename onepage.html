@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>onepageTEST</title>
+	<style type="text/css">
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		.page1{
+			height: 0;
+			
+			background-color: #aaa;
+		}
+		.page2{
+			height: 2000px;
+			background-color: yellow;
+		}
+	</style>
+	<script type="text/javascript">
+		window.onload = function()
+		{
+			var orgHeight = window.innerHeight;
+			var page1 = document.getElementsByClassName('page1')[0];
+			var page2 = document.getElementsByClassName('page2')[0];
+			page1.style.height = orgHeight+"px";
+
+			//获取元素的offset方法
+			function getOffset(Node, offset) {
+			    if (!offset) {
+			        offset = {};
+			        offset.top = 0;
+			        offset.left = 0;
+			    }
+
+			    if (Node == document.body) {//当该节点为body节点时，结束递归
+			        return offset;
+			    }
+
+			    offset.top += Node.offsetTop;
+			    offset.left += Node.offsetLeft;
+
+			    return getOffset(Node.parentNode, offset);//向上累加offset里的值
+			}
+
+			function mouseWheel(ev){
+	            var direction="up";
+	            
+	            //其他浏览器ev.wheelDelta<0是向下，火狐ev.detail>0是向下
+	            if(ev.wheelDelta && ev.wheelDelta<0 || ev.detail>0){
+	                direction="down";
+	            };
+	            if(direction==="up"){
+	            	var scrollTop = window.pageYOffset  //用于FF
+					                || document.documentElement.scrollTop 
+					                || document.body.scrollTop 
+					                || 0;
+	            	if (scrollTop==0) {
+	            		page1.style.transition = "0.5s";
+	            		page1.style.height = orgHeight+"px";
+	            	}     
+	            }
+	            else{
+	            	page1.style.transition = "0.5s";
+	                page1.style.height = 0;
+	                var p2top = getOffset(page2).top;
+	                if(p2top > 0) {
+	                	if (ev.preventDefault()) {
+		                	//firefox
+		                	ev.preventDefault();
+		                	ev.stopPropagation();
+		                }else {
+		                	//IE
+		                	ev.cancelBubble = true;
+		                	ev.returnValue = false;
+	                	}
+	                }
+	                
+	            };
+	        }
+
+	       //其他浏览器
+	        window.addEventListener('mousewheel',mouseWheel);
+	        //火狐
+	        window.addEventListener('DOMMouseScroll',mouseWheel);
+
+		}
+	</script>
+</head>
+<body>
+	<div class="page1"></div>
+	<div class="page2"></div>
+</body>
+</html>
+
